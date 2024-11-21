@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
           id: song.id,
           audio_url: song.song_path || '',
           image_url: song.image_path || '',
-          prompt: song.prompt || '',
+          prompt: song.lyrics || '',
           model_name: 'udio',
           title: song.title || '',
           tags: song.tags?.join(',') || '',
