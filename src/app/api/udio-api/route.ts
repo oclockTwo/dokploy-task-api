@@ -78,7 +78,7 @@ async function checkSongs(trackIds: string[], retryCount = 5): Promise<SongsResp
 
       if (!response.ok) {
         const errorMessage = await response.json();
-        throw new Error(`Failed to fetch songs: ${errorMessage}`);
+        throw new Error(`Failed to fetch songs: ${JSON.stringify(errorMessage)}`);
       }
 
       return response.json();
