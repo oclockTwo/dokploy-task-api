@@ -101,6 +101,10 @@ export async function POST(req: NextRequest) {
     const body: UpdateTaskReqBody = await req.json();
     const { trackIds, callbackUrl, taskId } = body;
 
+    console.log('trackIds', trackIds);
+    console.log('callbackUrl', callbackUrl);
+    console.log('taskId', taskId);
+
     const startTime = Date.now();
     let allFinished = false;
     let data: SongsResponse;
