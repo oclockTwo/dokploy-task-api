@@ -96,6 +96,35 @@ async function checkSongs(trackIds: string[], retryCount = 5): Promise<SongsResp
   throw new Error('Unreachable code');
 }
 
+async function sendCallback(url: string, data: CallbackSuccessData | CallbackErrorData, retryCount = 3) {
+  for (let i = 0; i < retryCount; i++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Callback failed with status: ${response.status}`);
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Callback attempt ${i + 1} failed:`, error);
+      
+      if (i === retryCount - 1) {
+        throw error;
+      }
+      
+      // 在重试之前等待 2 秒
+      await sleep(2000);
+    }
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body: UpdateTaskReqBody = await req.json();
@@ -156,14 +185,8 @@ export async function POST(req: NextRequest) {
               }
             } as CallbackSuccessData;
 
-        // 添加 Authorization header 到回调请求
-        await fetch(callbackUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(callbackData)
-        });
+        // 替换原来的 fetch 调用
+        await sendCallback(callbackUrl, callbackData);
 
         return NextResponse.json({ 
           status: 'success', 
